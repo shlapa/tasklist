@@ -40,7 +40,7 @@ func (r *TaskRepository) GetAllTasks(ctx context.Context) ([]model.Task, error) 
 	var tasks []model.Task
 	for rows.Next() {
 		var task model.Task
-		if err := rows.Scan(
+		if err = rows.Scan(
 			&task.ID,
 			&task.Title,
 			&task.Description,

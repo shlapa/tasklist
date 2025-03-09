@@ -6,6 +6,9 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"log"
 	"os"
 	"tasklist/internal/database"
@@ -23,6 +26,24 @@ func mustURL() string {
 	return databaseURL
 }
 
+func runMigrations() {
+	databaseURL := mustURL() + "?sslmode=disable"
+
+	m, err := migrate.New(
+		"file://migrations",
+		databaseURL,
+	)
+	if err != nil {
+		log.Fatalf("Failed to initialize migrations: %v", err)
+	}
+
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		log.Fatalf("Failed to apply migrations: %v", err)
+	}
+
+	log.Println("Migrations applied successfully")
+}
+
 func main() {
 	//databaseURL := "postgres://???:???@localhost:5432/tasklist"
 	databaseURL := mustURL()
@@ -32,7 +53,8 @@ func main() {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 	defer pool.Close()
-
+	// Выполнение миграций
+	runMigrations()
 	// Инициализация репозитория и обработчика
 	taskRepo := repository.NewTaskRepository(pool)
 	taskHandler := handler.NewTaskHandler(taskRepo)
