@@ -8,9 +8,9 @@ import (
 type TaskStatus string
 
 const (
-	StatusNew        TaskStatus = "new"
-	StatusInProgress TaskStatus = "in_progress"
-	StatusDone       TaskStatus = "done"
+	StatusNew        TaskStatus = "new"         // Новая
+	StatusInProgress TaskStatus = "in_progress" // В процессе
+	StatusDone       TaskStatus = "done"        // Выполненна
 )
 
 type Task struct {
